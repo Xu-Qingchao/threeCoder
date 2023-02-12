@@ -1,0 +1,18 @@
+syntax = "proto3";
+package pb;
+option go_package = "/internal/service;service";
+
+message VideoModel {
+  // @inject_tag: json:"id"
+  uint32  Id=1;
+  // @inject_tag: json:"author_id"
+  uint32 AuthorId=2;
+  // @inject_tag: json:"title"
+  string Title=3;
+  // @inject_tag: json:"play_url"
+  string PlayUrl=4;
+  // @inject_tag: json:"cover_url"
+  string CoverUrl=5;
+  // @inject_tag: json:"create_time"
+  uint32 CreateTime=6;
+}

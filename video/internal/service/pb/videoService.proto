@@ -1,0 +1,32 @@
+syntax="proto3";
+package pb;
+import "videoModels.proto";
+option go_package = "/internal/service;service";
+
+message VideoRequest{
+  repeated uint32 Id=1;
+  uint32 AuthorId=2;
+  string Title=3;
+  string PlayUrl=4;
+  string CoverUrl=5;
+  uint32 CreateTime=6;
+}
+
+
+message VideoDetailResponse{
+  repeated VideoModel VideoDetail=1;
+  uint32 Code=2;
+}
+
+message CommonResponse{
+  uint32 Code=1;
+  string Msg=2;
+  string Data=3;
+}
+
+service VideoService{
+  rpc FindVideosByTime(VideoRequest) returns(VideoDetailResponse);
+  rpc FindVideosByUser(VideoRequest) returns(VideoDetailResponse);
+  rpc FindVideosByIds(VideoRequest) returns(VideoDetailResponse);
+  rpc CreateVideo(VideoRequest) returns(CommonResponse);
+}

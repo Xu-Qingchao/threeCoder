@@ -18,6 +18,7 @@ func NewRouter(service ...interface{}) *gin.Engine {
 		v1.POST("/user/register/", handler.Register)
 		v1.POST("/user/login/", handler.Login)
 		v1.GET("/user/", handler.UserInfo)
+		v1.GET("/feed/", handler.Feed)
 	}
 
 	return ginRouter
