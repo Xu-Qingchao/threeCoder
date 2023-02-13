@@ -34,7 +34,7 @@ func NewResolver(etcdAddrs []string, logger *logrus.Logger) *Resolver {
 	return &Resolver{
 		schema:      schema,
 		EtcdAddrs:   etcdAddrs,
-		DialTimeout: 3,
+		DialTimeout: 5,
 		logger:      logger,
 	}
 }

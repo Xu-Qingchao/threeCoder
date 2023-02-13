@@ -22,6 +22,7 @@ import (
 
 func main() {
 	config.InitConfig()
+
 	go startListen()
 	{
 		osSignal := make(chan os.Signal, 1)
@@ -36,6 +37,7 @@ func main() {
 func startListen() {
 	// etcd注册
 	etcdAddress := []string{viper.GetString("etcd.address")}
+	print(viper.GetString("server.port") + "123")
 	etcdRegister := discovery.NewResolver(etcdAddress, logrus.New())
 	resolver.Register(etcdRegister)
 	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)

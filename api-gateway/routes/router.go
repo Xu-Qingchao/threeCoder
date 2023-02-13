@@ -19,6 +19,10 @@ func NewRouter(service ...interface{}) *gin.Engine {
 		v1.POST("/user/login/", handler.Login)
 		v1.GET("/user/", handler.UserInfo)
 		v1.GET("/feed/", handler.Feed)
+		v1.Static("/static", "./static")
+		// 需要登录鉴权的
+		v1.POST("/publish/action/", handler.PublishVideo)
+		v1.GET("/publish/list/", handler.PublishList)
 	}
 
 	return ginRouter

@@ -1,8 +1,12 @@
 server:
   domain: api-gateway
+  host: 192.168.43.125
   port: :4000
   jwtSecret: secret
   version: 1.0
+
+staticUrl: D:\Projects\GoProjects\字节青训营项目\threeCoder\api-gateway\static\
+ffmpeg: D:\IDE\ffmpeg-4.3.1-2021-01-01-essentials_build\bin\ffmpeg
 
 etcd:
   address: 127.0.0.1:2379
@@ -10,3 +14,4 @@ etcd:
 domain:
   user: user
   video: video
+
