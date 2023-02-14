@@ -23,6 +23,8 @@ func NewRouter(service ...interface{}) *gin.Engine {
 		// 需要登录鉴权的
 		v1.POST("/publish/action/", handler.PublishVideo)
 		v1.GET("/publish/list/", handler.PublishList)
+		v1.POST("/comment/action/", handler.CommentAction)
+		v1.GET("/comment/list/", handler.CommentList)
 	}
 
 	return ginRouter

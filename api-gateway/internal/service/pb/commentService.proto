@@ -1,0 +1,32 @@
+syntax="proto3";
+package pb;
+import "commentModels.proto";
+option go_package = "/internal/service;service";
+
+message CommentRequest{
+  uint32 Id=1;
+  uint32 UserId=2;
+  uint32 VideoId=3;
+  string Content=4;
+  string Status=5;
+  uint32 CreateTime=6;
+}
+
+
+message CommentDetailResponse{
+  repeated CommentModel CommentDetail=1;
+  uint32 Code=2;
+}
+
+message CommentCommonResponse{
+  uint32 Code=1;
+  uint32 Id=4;
+  string Msg=2;
+  string Data=3;
+}
+
+service CommentService{
+  rpc CreateComment(CommentRequest) returns(CommentCommonResponse);
+  rpc DeleteComment(CommentRequest) returns(CommentCommonResponse);
+  rpc FindCommentByVideo(CommentRequest) returns(CommentDetailResponse);
+}

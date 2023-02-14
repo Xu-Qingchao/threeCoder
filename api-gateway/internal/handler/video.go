@@ -95,8 +95,6 @@ func Feed(ginCtx *gin.Context) {
 	videoReq := service.VideoRequest{CreateTime: uint32(createTime)}
 	// gin.Key 中取出服务实例
 	userService := ginCtx.Keys["user"].(service.UserServiceClient)
-	print(ginCtx.Keys["user"])
-	print(ginCtx.Keys["video"])
 	videoService := ginCtx.Keys["video"].(service.VideoServiceClient)
 	videoResp, err := videoService.FindVideosByTime(context.Background(), &videoReq)
 	if err != nil {

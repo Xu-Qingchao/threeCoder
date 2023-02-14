@@ -37,13 +37,13 @@ func main() {
 func startListen() {
 	// etcd注册
 	etcdAddress := []string{viper.GetString("etcd.address")}
-	print(viper.GetString("server.port") + "123")
 	etcdRegister := discovery.NewResolver(etcdAddress, logrus.New())
 	resolver.Register(etcdRegister)
 	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 	// 服务名
 	userServiceName := viper.GetString("domain.user")
 	videoServiceName := viper.GetString("domain.video")
+	commentServiceName := viper.GetString("domain.comment")
 
 	// RPC 连接
 	connUser, err := RPCConnect(ctx, userServiceName, etcdRegister)
@@ -58,11 +58,18 @@ func startListen() {
 	}
 	videoService := service.NewVideoServiceClient(connVideo)
 
+	connComment, err := RPCConnect(ctx, commentServiceName, etcdRegister)
+	if err != nil {
+		return
+	}
+	commentService := service.NewCommentServiceClient(connComment)
+
 	// 加入熔断 TODO main太臃肿了
 	wrapper.NewServiceWrapper(userServiceName)
 	wrapper.NewServiceWrapper(videoServiceName)
+	wrapper.NewServiceWrapper(commentServiceName)
 
-	ginRouter := routes.NewRouter(userService, videoService)
+	ginRouter := routes.NewRouter(userService, videoService, commentService)
 	server := &http.Server{
 		Addr:           viper.GetString("server.port"),
 		Handler:        ginRouter,
