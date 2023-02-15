@@ -15,4 +15,5 @@ domain:
   user: user
   video: video
   comment: comment
+  like: like
 

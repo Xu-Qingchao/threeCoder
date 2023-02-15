@@ -1,0 +1,21 @@
+server:
+  domain: like
+  version: 1.0
+  jwtSecret: secret # 加密要用到的
+  grpcAddress: "127.0.0.1:10004"
+
+mysql:
+  driverName: mysql
+  host: 127.0.0.1
+  port: 3306
+  database: three_coder
+  username: root
+  password: 333
+  charset: utf8mb4
+
+etcd:
+  address: 127.0.0.1:2379
+
+redis:
+  address: 127.0.0.1:6379
+  password:

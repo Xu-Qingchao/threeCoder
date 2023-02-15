@@ -75,9 +75,8 @@ func PublishList(ginCtx *gin.Context) {
 			Title:    resList[i].Title,
 		})
 	}
-	ginCtx.JSON(http.StatusOK, FeedResponse{
+	ginCtx.JSON(http.StatusOK, VideoInfoResponse{
 		Response:  res.Response{StatusCode: 0},
-		NextTime:  int64(resList[length-1].CreateTime),
 		VideoList: videoList,
 	})
 }

@@ -25,6 +25,8 @@ func NewRouter(service ...interface{}) *gin.Engine {
 		v1.GET("/publish/list/", handler.PublishList)
 		v1.POST("/comment/action/", handler.CommentAction)
 		v1.GET("/comment/list/", handler.CommentList)
+		v1.POST("/favorite/action/", handler.FavoriteAction)
+		v1.GET("/favorite/list/", handler.FavoriteList)
 	}
 
 	return ginRouter

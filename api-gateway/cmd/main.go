@@ -44,6 +44,7 @@ func startListen() {
 	userServiceName := viper.GetString("domain.user")
 	videoServiceName := viper.GetString("domain.video")
 	commentServiceName := viper.GetString("domain.comment")
+	likeServiceName := viper.GetString("domain.like")
 
 	// RPC 连接
 	connUser, err := RPCConnect(ctx, userServiceName, etcdRegister)
@@ -64,12 +65,19 @@ func startListen() {
 	}
 	commentService := service.NewCommentServiceClient(connComment)
 
+	connLike, err := RPCConnect(ctx, likeServiceName, etcdRegister)
+	if err != nil {
+		return
+	}
+	likeService := service.NewLikeServiceClient(connLike)
+
 	// 加入熔断 TODO main太臃肿了
 	wrapper.NewServiceWrapper(userServiceName)
 	wrapper.NewServiceWrapper(videoServiceName)
 	wrapper.NewServiceWrapper(commentServiceName)
+	wrapper.NewServiceWrapper(likeServiceName)
 
-	ginRouter := routes.NewRouter(userService, videoService, commentService)
+	ginRouter := routes.NewRouter(userService, videoService, commentService, likeService)
 	server := &http.Server{
 		Addr:           viper.GetString("server.port"),
 		Handler:        ginRouter,

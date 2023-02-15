@@ -1,0 +1,29 @@
+syntax="proto3";
+package pb;
+import "likeModels.proto";
+option go_package = "/internal/service;service";
+
+message LikeRequest{
+  uint32 UserId=1;
+  uint32 VideoId=2;
+}
+
+
+message LikeDetailResponse{
+  repeated LikeModel LikeDetail=1;
+  uint32 Code=2;
+}
+
+message LikeCommonResponse{
+  uint32 Code=1;
+  string Msg=2;
+  bool IsLike=3;
+}
+
+service LikeService{
+  rpc CreateLike(LikeRequest) returns(LikeCommonResponse);
+  rpc DeleteLike(LikeRequest) returns(LikeCommonResponse);
+  rpc FindVideoIds(LikeRequest) returns(LikeDetailResponse);
+  rpc IsLike(LikeRequest) returns(LikeCommonResponse);
+
+}
