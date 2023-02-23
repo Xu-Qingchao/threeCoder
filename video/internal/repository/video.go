@@ -47,7 +47,8 @@ func (*Video) SelectVideosByUser(req *service.VideoRequest) (videoList []Video, 
 
 func (*Video) SelectVideosByIds(req *service.VideoRequest) (videoList []Video, err error) {
 	// 这里req要遍历一下才对
-	err = DB.Model(Video{}).Where("id=?", req.Id).Find(&videoList).Error
+
+	err = DB.Model(Video{}).Where("id in ?", req.Id).Find(&videoList).Error
 	if err != nil {
 		return videoList, err
 	}

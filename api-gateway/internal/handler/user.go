@@ -51,9 +51,10 @@ func Register(ginCtx *gin.Context) {
 			ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 2, StatusMsg: "系统错误！"})
 		} else {
 			ginCtx.JSON(http.StatusOK, UserLoginResponse{Response: res.Response{
-				StatusCode: 0},
+				StatusCode: 0, StatusMsg: "注册成功！"},
 				UserId: int64(userResp.UserDetail.Id),
-				Token:  token,
+
+				Token: token,
 			})
 		}
 	}
@@ -81,7 +82,7 @@ func Login(ginCtx *gin.Context) {
 			ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 2, StatusMsg: "系统错误"})
 		} else {
 			ginCtx.JSON(http.StatusOK, UserLoginResponse{
-				Response: res.Response{StatusCode: 0},
+				Response: res.Response{StatusCode: 0, StatusMsg: "登录成功！"},
 				UserId:   int64(userResp.UserDetail.Id),
 				Token:    token,
 			})

@@ -52,6 +52,8 @@ func PublishList(ginCtx *gin.Context) {
 	// gin.Key 中取出服务实例
 	userService := ginCtx.Keys["user"].(service.UserServiceClient)
 	videoService := ginCtx.Keys["video"].(service.VideoServiceClient)
+	likeService := ginCtx.Keys["like"].(service.LikeServiceClient)
+	commentService := ginCtx.Keys["comment"].(service.CommentServiceClient)
 	videoResp, err := videoService.FindVideosByUser(context.Background(), &videoReq)
 	if err != nil {
 		ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 1, StatusMsg: err.Error()})
@@ -64,15 +66,39 @@ func PublishList(ginCtx *gin.Context) {
 	userReq := service.UserRequest{Id: uint32(tUserId)}
 	userResp, _ := userService.FindUser(context.Background(), &userReq)
 	for i := 0; i < length; i++ {
+
+		// 获取点赞数量和评论数量
+		likeReq := service.LikeRequest{VideoId: resList[i].Id}
+		likeResp, _ := likeService.FindCountByVideo(context.Background(), &likeReq)
+		// 评论数量
+		commentReq := service.CommentRequest{VideoId: resList[i].Id}
+		commentResp, _ := commentService.FindCommentByVideo(context.Background(), &commentReq)
+		commentCount := len(commentResp.CommentDetail)
+		// 看是否登录
+		token := ginCtx.Query("token") // 当前用户
+		// token用来鉴权
+		isLike := false
+		if token != "" {
+			claim, _ := util.ParseToken(token)
+			cUserId := claim.UserID
+			likeReq.UserId = uint32(cUserId)
+			// 是否点赞
+			islikeResp, _ := likeService.IsLike(context.Background(), &likeReq)
+			isLike = islikeResp.IsLike
+		}
+
 		videoList = append(videoList, Video{
 			Id: int64(resList[i].Id),
 			Author: User{
 				UserId:   int64(userResp.UserDetail.Id),
 				UserName: userResp.UserDetail.Username,
 			},
-			PlayUrl:  resList[i].PlayUrl,
-			CoverUrl: resList[i].CoverUrl,
-			Title:    resList[i].Title,
+			PlayUrl:       resList[i].PlayUrl,
+			CoverUrl:      resList[i].CoverUrl,
+			Title:         resList[i].Title,
+			IsFavorite:    isLike,
+			CommentCount:  int64(commentCount),
+			FavoriteCount: likeResp.Count,
 		})
 	}
 	ginCtx.JSON(http.StatusOK, VideoInfoResponse{
@@ -85,8 +111,11 @@ func Feed(ginCtx *gin.Context) {
 
 	// 未登录状态下的feed
 	latestTime := ginCtx.Query("latest_time")
+	createTime := uint64(time.Now().Unix())
+	if latestTime != "" {
+		createTime, _ = strconv.ParseUint(latestTime, 10, 32)
+	}
 
-	createTime, _ := strconv.ParseUint(latestTime, 10, 32)
 	videoReq := service.VideoRequest{CreateTime: uint32(createTime)}
 	// gin.Key 中取出服务实例
 	userService := ginCtx.Keys["user"].(service.UserServiceClient)
@@ -139,11 +168,19 @@ func Feed(ginCtx *gin.Context) {
 			IsFavorite:    isLike,
 		})
 	}
-	ginCtx.JSON(http.StatusOK, FeedResponse{
-		Response:  res.Response{StatusCode: 0},
-		NextTime:  int64(resList[length-1].CreateTime),
-		VideoList: videoList,
-	})
+	if length > 0 {
+		ginCtx.JSON(http.StatusOK, FeedResponse{
+			Response:  res.Response{StatusCode: 0},
+			NextTime:  int64(resList[length-1].CreateTime),
+			VideoList: videoList,
+		})
+	} else {
+		ginCtx.JSON(http.StatusOK, FeedResponse{
+			Response:  res.Response{StatusCode: 0},
+			NextTime:  int64(resList[length-1].CreateTime),
+			VideoList: videoList,
+		})
+	}
 }
 
 func PublishVideo(ginCtx *gin.Context) {
@@ -206,6 +243,6 @@ func PublishVideo(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusOK, res.Response{
 		StatusCode: 0,
-		StatusMsg:  "发布成功666",
+		StatusMsg:  "发布成功",
 	})
 }

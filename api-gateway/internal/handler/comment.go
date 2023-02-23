@@ -80,7 +80,7 @@ func CommentAction(ginCtx *gin.Context) {
 			})
 			return
 		}
-		ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 0})
+		ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 0, StatusMsg: "删除成功！"})
 	}
 }
 
