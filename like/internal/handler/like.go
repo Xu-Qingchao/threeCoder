@@ -75,3 +75,20 @@ func (*LikeService) IsLike(ctx context.Context, req *service.LikeRequest) (resp 
 	resp.IsLike = isLike
 	return resp, nil
 }
+
+// 统计视频点赞数量
+func (*LikeService) FindCountByVideo(ctx context.Context, req *service.LikeRequest) (resp *service.LikeCommonResponse, err error) {
+	var like repository.Like
+	resp = new(service.LikeCommonResponse)
+	count, err := like.SelectCountByVideo(req)
+	if err != nil {
+		resp.Code = e.ERROR
+		resp.Msg = e.GetMsg(uint(resp.Code))
+		resp.Count = 0
+		return resp, err
+	}
+	resp.Code = e.SUCCESS
+	resp.Msg = e.GetMsg(uint(resp.Code))
+	resp.Count = count
+	return resp, nil
+}

@@ -36,12 +36,21 @@ func (*Like) SelectVideoIds(req *service.LikeRequest) (likeList []Like, err erro
 	return likeList, nil
 }
 
+func (*Like) SelectCountByVideo(req *service.LikeRequest) (count int64, err error) {
+	DB.Model(Like{}).Where("video_id=?", req.VideoId).Count(&count)
+	return count, nil
+}
+
 func (like *Like) IsLike(req *service.LikeRequest) (isLike bool, err error) {
 	err = DB.Where("user_id=? and video_id=?", req.UserId, req.VideoId).Find(&like).Error
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	if like.Id == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
 }
 
 func BuildLikes(item []Like) (vList []*service.LikeModel) {

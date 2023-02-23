@@ -18,6 +18,7 @@ message LikeCommonResponse{
   uint32 Code=1;
   string Msg=2;
   bool IsLike=3;
+  int64 Count=4;
 }
 
 service LikeService{
@@ -25,5 +26,5 @@ service LikeService{
   rpc DeleteLike(LikeRequest) returns(LikeCommonResponse);
   rpc FindVideoIds(LikeRequest) returns(LikeDetailResponse);
   rpc IsLike(LikeRequest) returns(LikeCommonResponse);
-
+  rpc FindCountByVideo(LikeRequest) returns(LikeCommonResponse);
 }

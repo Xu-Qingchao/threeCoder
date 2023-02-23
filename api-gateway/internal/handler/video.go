@@ -82,10 +82,6 @@ func PublishList(ginCtx *gin.Context) {
 }
 
 func Feed(ginCtx *gin.Context) {
-	//token := ginCtx.Query("token")    // 当前用户
-	//// token用来鉴权
-	//claim, _ := util.ParseToken(token)
-	//cUserId := claim.UserID
 
 	// 未登录状态下的feed
 	latestTime := ginCtx.Query("latest_time")
@@ -95,6 +91,8 @@ func Feed(ginCtx *gin.Context) {
 	// gin.Key 中取出服务实例
 	userService := ginCtx.Keys["user"].(service.UserServiceClient)
 	videoService := ginCtx.Keys["video"].(service.VideoServiceClient)
+	likeService := ginCtx.Keys["like"].(service.LikeServiceClient)
+	commentService := ginCtx.Keys["comment"].(service.CommentServiceClient)
 	videoResp, err := videoService.FindVideosByTime(context.Background(), &videoReq)
 	if err != nil {
 		ginCtx.JSON(http.StatusOK, res.Response{StatusCode: 1, StatusMsg: err.Error()})
@@ -107,15 +105,38 @@ func Feed(ginCtx *gin.Context) {
 	for i := 0; i < length; i++ {
 		userReq := service.UserRequest{Id: resList[i].AuthorId}
 		userResp, _ := userService.FindUser(context.Background(), &userReq)
+		// 获取点赞数量和评论数量
+		likeReq := service.LikeRequest{VideoId: resList[i].Id}
+		likeResp, _ := likeService.FindCountByVideo(context.Background(), &likeReq)
+		// 评论数量
+		commentReq := service.CommentRequest{VideoId: resList[i].Id}
+		commentResp, _ := commentService.FindCommentByVideo(context.Background(), &commentReq)
+		commentCount := len(commentResp.CommentDetail)
+		// 看是否登录
+		token := ginCtx.Query("token") // 当前用户
+		// token用来鉴权
+		isLike := false
+		if token != "" {
+			claim, _ := util.ParseToken(token)
+			cUserId := claim.UserID
+			likeReq.UserId = uint32(cUserId)
+			// 是否点赞
+			islikeResp, _ := likeService.IsLike(context.Background(), &likeReq)
+			isLike = islikeResp.IsLike
+		}
+
 		videoList = append(videoList, Video{
 			Id: int64(resList[i].Id),
 			Author: User{
 				UserId:   int64(userResp.UserDetail.Id),
 				UserName: userResp.UserDetail.Username,
 			},
-			PlayUrl:  resList[i].PlayUrl,
-			CoverUrl: resList[i].CoverUrl,
-			Title:    resList[i].Title,
+			PlayUrl:       resList[i].PlayUrl,
+			CoverUrl:      resList[i].CoverUrl,
+			Title:         resList[i].Title,
+			FavoriteCount: likeResp.Count,
+			CommentCount:  int64(commentCount),
+			IsFavorite:    isLike,
 		})
 	}
 	ginCtx.JSON(http.StatusOK, FeedResponse{

@@ -26,6 +26,7 @@ type LikeServiceClient interface {
 	DeleteLike(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*LikeCommonResponse, error)
 	FindVideoIds(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*LikeDetailResponse, error)
 	IsLike(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*LikeCommonResponse, error)
+	FindCountByVideo(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*LikeCommonResponse, error)
 }
 
 type likeServiceClient struct {
@@ -72,6 +73,15 @@ func (c *likeServiceClient) IsLike(ctx context.Context, in *LikeRequest, opts ..
 	return out, nil
 }
 
+func (c *likeServiceClient) FindCountByVideo(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*LikeCommonResponse, error) {
+	out := new(LikeCommonResponse)
+	err := c.cc.Invoke(ctx, "/pb.LikeService/FindCountByVideo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LikeServiceServer is the server API for LikeService service.
 // All implementations must embed UnimplementedLikeServiceServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type LikeServiceServer interface {
 	DeleteLike(context.Context, *LikeRequest) (*LikeCommonResponse, error)
 	FindVideoIds(context.Context, *LikeRequest) (*LikeDetailResponse, error)
 	IsLike(context.Context, *LikeRequest) (*LikeCommonResponse, error)
+	FindCountByVideo(context.Context, *LikeRequest) (*LikeCommonResponse, error)
 	mustEmbedUnimplementedLikeServiceServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedLikeServiceServer) FindVideoIds(context.Context, *LikeRequest
 }
 func (UnimplementedLikeServiceServer) IsLike(context.Context, *LikeRequest) (*LikeCommonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsLike not implemented")
+}
+func (UnimplementedLikeServiceServer) FindCountByVideo(context.Context, *LikeRequest) (*LikeCommonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindCountByVideo not implemented")
 }
 func (UnimplementedLikeServiceServer) mustEmbedUnimplementedLikeServiceServer() {}
 
@@ -184,6 +198,24 @@ func _LikeService_IsLike_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LikeService_FindCountByVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LikeServiceServer).FindCountByVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.LikeService/FindCountByVideo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LikeServiceServer).FindCountByVideo(ctx, req.(*LikeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LikeService_ServiceDesc is the grpc.ServiceDesc for LikeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var LikeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IsLike",
 			Handler:    _LikeService_IsLike_Handler,
+		},
+		{
+			MethodName: "FindCountByVideo",
+			Handler:    _LikeService_FindCountByVideo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
